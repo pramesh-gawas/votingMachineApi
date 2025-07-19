@@ -23,6 +23,9 @@ const candidateRoutes = require("./routes/candidateRoutes");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/user", userRoutes);
 app.use("/candidate", candidateRoutes);
+app.get("/", (req, res) => {
+  res.json("hello");
+});
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
