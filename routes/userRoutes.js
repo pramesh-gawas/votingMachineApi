@@ -200,16 +200,6 @@ router.put(
 
       console.log(updateUserProfile);
 
-      if (role === "admin") {
-        const existingAdmin = await User.findOne({ role: "admin" });
-        if (existingAdmin) {
-          console.log("An admin user already exists. Cannot create another.");
-          return res.status(409).json({
-            error: "An admin user already exists. Only one admin is allowed.",
-          });
-        }
-      }
-
       const response = await User.findByIdAndUpdate(userID, updateUserProfile, {
         new: true, //return the updated document
         runValidators: true, // run mongoose validation
