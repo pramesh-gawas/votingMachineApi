@@ -105,8 +105,7 @@ router.post("/signup", upload.single("photo"), async (req, res) => {
       }
 
       return res.status(409).json({
-        error: "Duplicate Entry",
-        message: errorMessage,
+        error: `Duplicate Entry ${errorMessage}`,
         field: field,
       });
     } else {
