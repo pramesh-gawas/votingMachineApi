@@ -86,10 +86,36 @@ router.post("/signup", upload.single("photo"), async (req, res) => {
       .json({ response: response, token: token, message: "Sign in success" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "internal server error" });
+    if (error.name === "ValidationError") {
+      // Mongoose validation error (e.g., required field missing, minlength not met)
+      const errors = Object.keys(error.errors).map(
+        (key) => error.errors[key].message
+      );
+      return res.status(400).json({ message: "Validation failed", errors });
+    } else if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0];
+      const value = error.keyValue[field];
+
+      let errorMessage = `The ${field} '${value}' already exists. Please use a different one.`;
+
+      if (field === "aadharCardNumber") {
+        errorMessage;
+      } else if (field === "email") {
+        errorMessage;
+      }
+
+      return res.status(409).json({
+        error: "Duplicate Entry",
+        message: errorMessage,
+        field: field,
+      });
+    } else {
+      return res
+        .status(500)
+        .json({ error: "Internal Server Error", message: error.message });
+    }
   }
 });
-
 //login route
 
 router.post("/login", async (req, res) => {
