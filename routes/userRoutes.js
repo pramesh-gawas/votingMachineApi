@@ -417,14 +417,14 @@ router.put(
         });
       }
 
-      // let decoded;
-      // try {
-      //   decoded = jwt.verify(token, process.env.SECREATE_KEY);
-      //   req.user = decoded;
-      //   console.log("decoded user", req.user);
-      // } catch (error) {
-      //   return res.status(401).json({ error: "invalid token" });
-      // }
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.SECREATE_KEY);
+        req.user = decoded;
+        console.log("decoded user", req.user);
+      } catch (error) {
+        return res.status(401).json({ error: "invalid token" });
+      }
 
       console.log(userID, token, "token is verify");
       console.log("Decoded Token Payload:", decoded);
