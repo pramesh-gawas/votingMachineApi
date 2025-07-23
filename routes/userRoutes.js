@@ -423,7 +423,7 @@ router.put(
         req.user = decoded;
         console.log("decoded user", req.user);
       } catch (error) {
-        res.status(401).json({ error: "invalid token" });
+        return res.status(401).json({ error: "invalid token" });
       }
 
       console.log(userID, token, "this is verify");
@@ -451,7 +451,7 @@ router.put(
         .json({ message: "password updated", user: updatedUser.email });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
