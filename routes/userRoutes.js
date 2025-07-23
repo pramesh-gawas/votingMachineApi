@@ -421,6 +421,7 @@ router.put(
       try {
         decoded = jwt.verify(token, process.env.SECREATE_KEY);
         req.user = decoded;
+        next();
         console.log("decoded user", req.user);
       } catch (error) {
         return res.status(401).json({ error: "invalid token" });
@@ -441,11 +442,11 @@ router.put(
         }
       );
 
-      if (!updatedUser) {
-        return res.status(404).json({ error: "user not found" });
-      }
+      // if (!updatedUser) {
+      //   return res.status(404).json({ error: "user not found" });
+      // }
 
-      console.log("password Updated");
+      // console.log("password Updated");
       res
         .status(200)
         .json({ message: "password updated", user: updatedUser.email });
