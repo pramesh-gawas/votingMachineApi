@@ -367,7 +367,7 @@ router.post("/forgotpassword", upload.none(), async (req, res) => {
         <p>Hello,</p>
         <p>You have requested to reset your password for your account. Please click on the button below to proceed:</p>
         <p style="text-align: center; margin: 30px 0;">
-            <a href=${process.env.APIURL}/user/reset-password/${userID}/${token}"
+            <a href=${process.env.APIURL}/user/reset-password/${userID}/${token}
                style="background-color: #3b82f6; color: #ffffff; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
                 Reset My Password
             </a>
