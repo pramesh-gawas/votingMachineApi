@@ -83,7 +83,11 @@ router.post("/signup", upload.single("photo"), async (req, res) => {
 
     res
       .status(200)
-      .json({ response: response, token: token, message: "Sign in success" });
+      .json({
+        response: response,
+        token: token,
+        message: "User Registered Successfully",
+      });
   } catch (error) {
     console.log(error);
     if (error.name === "ValidationError") {
@@ -408,9 +412,9 @@ router.put(
   async (req, res) => {
     try {
       const { userID, token } = req.params;
-      console.log(userID, token);
+
       const { password } = req.body;
-      console.log(password, "password");
+
       if (!password || typeof password !== "string" || password.length < 6) {
         return res.status(400).json({
           message: "New password must be at least 6 characters long.",
@@ -421,13 +425,9 @@ router.put(
       try {
         decoded = jwt.verify(token, process.env.SECREATE_KEY);
         req.user = decoded;
-        console.log("decoded user", req.user);
       } catch (error) {
         return res.status(401).json({ error: "invalid token" });
       }
-
-      console.log(userID, token, "token is verify");
-      console.log("Decoded Token Payload:", decoded);
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -440,12 +440,6 @@ router.put(
           runValidators: true,
         }
       );
-
-      // if (!updatedUser) {
-      //   return res.status(404).json({ error: "user not found" });
-      // }
-
-      // console.log("password Updated");
       res
         .status(200)
         .json({ message: "password updated", user: updatedUser.email });
