@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const { put } = require("@vercel/blob");
 
 const checkAdminRole = async (userId) => {
   try {
@@ -17,15 +18,7 @@ const checkAdminRole = async (userId) => {
   }
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads");
-  },
-  filename: (req, file, cb) => {
-    console.log(file);
-    return cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage });
 
@@ -43,8 +36,25 @@ router.post("/signup", upload.single("photo"), async (req, res) => {
       role,
       isVoted,
     } = req.body;
-    const uploadPhoto = req.file ? req.file.path : null;
-    console.log(uploadPhoto + "UPLOAD FILE");
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No photo uploaded." });
+    }
+
+    const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+    if (!vercelBlobToken) {
+      return res
+        .status(500)
+        .json({ error: "Vercel Blob token is not configured." });
+    }
+
+    const blob = await put(req.file.originalname, req.file.buffer, {
+      access: "public",
+      token: vercelBlobToken,
+    });
+
+    const uploadPhoto = blob.url;
 
     const updateUserProfile = new User({
       firstname,
@@ -81,17 +91,14 @@ router.post("/signup", upload.single("photo"), async (req, res) => {
     const token = generateToken(payload);
     console.log(token);
 
-    res
-      .status(200)
-      .json({
-        response: response,
-        token: token,
-        message: "User Registered Successfully",
-      });
+    res.status(200).json({
+      response: response,
+      token: token,
+      message: "User Registered Successfully",
+    });
   } catch (error) {
     console.log(error);
     if (error.name === "ValidationError") {
-      // Mongoose validation error (e.g., required field missing, minlength not met)
       const errors = Object.keys(error.errors).map(
         (key) => error.errors[key].message
       );
@@ -210,8 +217,25 @@ router.put(
         isVoted,
         photo,
       } = req.body;
-      const uploadPhoto = req.file ? req.file.path : photo;
-      console.log(uploadPhoto + "UPLOAD FILE");
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No photo uploaded." });
+      }
+
+      const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+      if (!vercelBlobToken) {
+        return res
+          .status(500)
+          .json({ error: "Vercel Blob token is not configured." });
+      }
+
+      const blob = await put(req.file.originalname, req.file.buffer, {
+        access: "public",
+        token: vercelBlobToken,
+      });
+
+      const uploadPhoto = blob.url;
 
       const updateUserProfile = {
         firstname,
@@ -246,6 +270,7 @@ router.put(
   }
 );
 
+//admin control user add
 router.post("/", upload.single("photo"), async (req, res) => {
   try {
     const {
@@ -260,8 +285,24 @@ router.post("/", upload.single("photo"), async (req, res) => {
       role,
       isVoted,
     } = req.body;
-    const uploadPhoto = req.file ? req.file.path : null;
-    console.log(uploadPhoto + "UPLOAD FILE");
+    if (!req.file) {
+      return res.status(400).json({ error: "No photo uploaded." });
+    }
+
+    const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+    if (!vercelBlobToken) {
+      return res
+        .status(500)
+        .json({ error: "Vercel Blob token is not configured." });
+    }
+
+    const blob = await put(req.file.originalname, req.file.buffer, {
+      access: "public",
+      token: vercelBlobToken,
+    });
+
+    const uploadPhoto = blob.url;
 
     const updateUserProfile = new User({
       firstname,
