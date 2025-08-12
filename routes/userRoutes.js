@@ -197,6 +197,7 @@ router.put(
   async (req, res) => {
     try {
       const userID = req.params.userID;
+      const existingUser = await User.findById(userID);
       if (!(await checkAdminRole(req.user.id))) {
         return res
           .status(403)
@@ -214,23 +215,26 @@ router.put(
         password,
         role,
         isVoted,
-        photo,
       } = req.body;
 
-      const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
+      let uploadPhoto = existingUser.photo;
 
-      if (!vercelBlobToken) {
-        return res
-          .status(500)
-          .json({ error: "Vercel Blob token is not configured." });
+      if (req.file) {
+        const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+        if (!vercelBlobToken) {
+          return res
+            .status(500)
+            .json({ error: "Vercel Blob token is not configured." });
+        }
+
+        const blob = await put(req.file.originalname, req.file.buffer, {
+          access: "public",
+          token: vercelBlobToken,
+        });
+
+        uploadPhoto = blob.url;
       }
-
-      const blob = await put(req.file.originalname, req.file.buffer, {
-        access: "public",
-        token: vercelBlobToken,
-      });
-
-      const uploadPhoto = blob.url;
 
       const updateUserProfile = {
         firstname,
