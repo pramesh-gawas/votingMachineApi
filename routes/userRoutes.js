@@ -173,7 +173,6 @@ router.put("/profile/password", jwtAuthMiddleWare, async (req, res) => {
   try {
     const userId = req.user.id;
     const { currentPassword, newPassword } = req.body;
-
     const user = await User.findById(userId);
     if (!(await user.comparePassword(currentPassword))) {
       return res.status(401).json({ error: "invalid password " });
@@ -217,10 +216,6 @@ router.put(
         isVoted,
         photo,
       } = req.body;
-
-      if (!req.file) {
-        return res.status(400).json({ error: "No photo uploaded." });
-      }
 
       const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
 
