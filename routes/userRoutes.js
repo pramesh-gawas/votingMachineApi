@@ -231,6 +231,7 @@ router.put(
         const blob = await put(req.file.originalname, req.file.buffer, {
           access: "public",
           token: vercelBlobToken,
+          allowOverwrite: true,
         });
 
         uploadPhoto = blob.url;
@@ -299,6 +300,7 @@ router.post("/", upload.single("photo"), async (req, res) => {
     const blob = await put(req.file.originalname, req.file.buffer, {
       access: "public",
       token: vercelBlobToken,
+      allowOverwrite: true,
     });
 
     const uploadPhoto = blob.url;
